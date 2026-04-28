@@ -141,13 +141,14 @@
 const SYS = "You are an expert in Ayurvedic medicine, Sanskrit texts, and academic plagiarism detection. IGNORE: standard Ayurvedic/Sanskrit terminology, classical shloka quotations with citations, botanical Latin names. FOCUS ON: original analytical framing, methodology, result interpretations, conclusions. FLAG: passages copied or closely paraphrased from non-classical external sources. Respond with valid JSON only, no markdown.";
 
 async function callAI(prompt) {
-  const r = await fetch("https://text.pollinations.ai/openai", {
+  const r = await fetch("https://text.pollinations.ai/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       model: "openai-large",
       messages: [{ role: "system", content: SYS }, { role: "user", content: prompt }],
       max_tokens: 2000,
+      jsonMode: true,
       seed: 42
     })
   });

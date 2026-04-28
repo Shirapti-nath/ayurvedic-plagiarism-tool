@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PRD — Ayurvedic Plagiarism Detector</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;color:#1e293b;background:#f8fafc;padding:40px 20px}
+    .page{max-width:820px;margin:0 auto;background:#fff;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.08);padding:56px 64px}
+    @media(max-width:600px){.page{padding:32px 24px}}
+    .cover{border-bottom:3px solid #7c3aed;padding-bottom:32px;margin-bottom:40px}
+    .logo{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .logo-icon{width:44px;height:44px;background:#7c3aed;border-radius:10px;display:flex;align-items:center;justify-content:center}
+    .logo-icon svg{width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    h1{font-size:28px;font-weight:700;color:#0f172a;line-height:1.2;margin-bottom:8px}
+    .meta{display:flex;flex-wrap:wrap;gap:16px;margin-top:16px}
+    .badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px}
+    .v{background:#ede9fe;color:#6d28d9}
+    .d{background:#f1f5f9;color:#475569}
+    .s{background:#dcfce7;color:#15803d}
+    h2{font-size:18px;font-weight:700;color:#0f172a;margin:36px 0 12px;padding-bottom:6px;border-bottom:2px solid #e2e8f0}
+    h3{font-size:14px;font-weight:700;color:#374151;margin:20px 0 8px}
+    p{font-size:14px;line-height:1.7;color:#374151;margin-bottom:12px}
+    ul,ol{padding-left:20px;margin-bottom:12px}
+    li{font-size:14px;line-height:1.7;color:#374151;margin-bottom:4px}
+    table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+    th{background:#f1f5f9;color:#374151;font-weight:600;text-align:left;padding:10px 12px;border:1px solid #e2e8f0}
+    td{padding:9px 12px;border:1px solid #e2e8f0;color:#374151;vertical-align:top}
+    tr:nth-child(even)td{background:#fafafa}
+    code{background:#f1f5f9;color:#7c3aed;padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace}
+    .callout{background:#ede9fe;border-left:4px solid #7c3aed;padding:14px 18px;border-radius:6px;margin:16px 0}
+    .callout p{color:#4c1d95;margin:0;font-size:13px}
+    .tag{display:inline-block;background:#f1f5f9;color:#64748b;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:600;margin:2px}
+    .print-btn{position:fixed;bottom:28px;right:28px;background:#7c3aed;color:#fff;border:none;padding:12px 22px;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(124,58,237,.4);display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif}
+    .print-btn:hover{background:#6d28d9}
+    @media print{
+      body{background:#fff;padding:0}
+      .page{box-shadow:none;border-radius:0;padding:32px 40px;max-width:none}
+      .print-btn{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<button class="print-btn" onclick="window.print()">
+  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+  Save as PDF / Print
+</button>
+
+<div class="page">
+
+  <div class="cover">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:600;color:#7c3aed;letter-spacing:.05em;text-transform:uppercase">Product Requirements Document</div>
+        <div style="font-size:15px;font-weight:700;color:#0f172a">Ayurvedic Plagiarism Detector</div>
+      </div>
+    </div>
+    <h1>Domain-Aware Plagiarism Detection<br/>for Ayurvedic Research Articles</h1>
+    <div class="meta">
+      <span class="badge v">Version 1.0</span>
+      <span class="badge d">April 28, 2026</span>
+      <span class="badge s">Status: Live</span>
+    </div>
+    <p style="margin-top:20px;color:#64748b;font-size:13px">Author: Shirapti Nath &nbsp;·&nbsp; Live site: <code>shirapti-nath.github.io/ayurvedic-plagiarism-tool</code></p>
+  </div>
+
+  <h2>1. Problem Statement</h2>
+  <div class="callout"><p>Plagiarism detection in Ayurvedic research is substantially harder than in conventional biomedical literature. Generic tools like Turnitin produce high false-positive rates because they cannot distinguish domain-specific Sanskrit vocabulary from actual copied content.</p></div>
+
+  <h3>1.1 Why Ayurvedic Research Is Different</h3>
+  <table>
+    <tr><th>Challenge</th><th>Impact on Generic Tools</th></tr>
+    <tr><td><strong>Sanskrit &amp; transliterated terms</strong> (Dosha, Prakriti, Panchakarma, Rasayana)</td><td>Identical across all legitimate papers — flagged as matches even in original work</td></tr>
+    <tr><td><strong>Classical text citations</strong> (Charaka Samhita, Sushruta Samhita, Ashtanga Hridayam)</td><td>Direct shloka quotations are required citation — marked as plagiarism by n-gram tools</td></tr>
+    <tr><td><strong>Traditional knowledge paraphrase</strong></td><td>Same canonical concepts described in slightly varied language across hundreds of papers</td></tr>
+    <tr><td><strong>Multilingual / code-switched content</strong></td><td>English + Sanskrit + Devanagari breaks monolingual tokenization pipelines</td></tr>
+    <tr><td><strong>No centralized Ayurvedic corpus</strong></td><td>No PubMed-equivalent; journals are partially indexed, not uniformly searchable</td></tr>
+  </table>
+
+  <h2>2. Target Users</h2>
+  <table>
+    <tr><th>User Segment</th><th>Primary Need</th><th>Context</th></tr>
+    <tr><td>Ayurvedic Journal Editors</td><td>Screen submissions before peer review</td><td>40–80 submissions/month; need fast, reliable signals</td></tr>
+    <tr><td>Researchers &amp; PhD Students</td><td>Self-check before submission</td><td>Unintentional overlap with classical sources</td></tr>
+    <tr><td>Academic Institutions (NIA, IPGT&amp;RA, GAU)</td><td>Validate thesis chapters</td><td>UGC compliance; thesis committees need defensible reports</td></tr>
+    <tr><td>AYUSH Ministry Bodies</td><td>Quality assurance for funded research</td><td>Grant-linked publication requirements</td></tr>
+    <tr><td>Research Supervisors</td><td>Review multiple students' work</td><td>Need readable, actionable reports</td></tr>
+  </table>
+  <p><strong>Primary persona:</strong> A journal editor who receives 40–80 submissions per month, uses generic tools that give confusing results, and needs a domain-aware report they can act on in under 5 minutes per article.</p>
+
+  <h2>3. Core Features — v1 Scope</h2>
+
+  <h3>3.1 Input Methods</h3>
+  <ul>
+    <li><strong>Text paste:</strong> User pastes article text directly (minimum 200 characters, up to ~5,000 words)</li>
+    <li><strong>URL fetch:</strong> User provides a public URL; text is extracted via CORS proxy (allorigins.win)</li>
+  </ul>
+
+  <h3>3.2 AI Semantic Analysis</h3>
+  <ul>
+    <li>Uses <strong>Pollinations AI</strong> (free, no account/API key required) with OpenAI-large model via <code>text.pollinations.ai</code></li>
+    <li>Domain-aware system prompt instructs the AI to ignore Sanskrit/Ayurvedic terminology and classical citations</li>
+    <li>AI distinguishes: legitimate classical citations · domain vocabulary · suspicious paraphrasing · direct copying</li>
+    <li>Returns structured JSON: score, flagged passages, domain terms excluded, classical references, editor guidance</li>
+  </ul>
+
+  <h3>3.3 Plagiarism Score &amp; Report</h3>
+  <ul>
+    <li><strong>0–100% score</strong> with color-coded ring (green / yellow / orange / red)</li>
+    <li>Score thresholds: 0–15 Minimal · 16–35 Some Similarity · 36–60 Notable · 61–100 High</li>
+    <li>Passage-level flags with confidence level (high / medium / low) and reason</li>
+    <li>Classical references section (green, explicitly not flagged)</li>
+    <li>Domain terms excluded list (prevents false positives)</li>
+    <li>Plain-English editor guidance paragraph</li>
+  </ul>
+
+  <h3>3.4 Domain-Aware False Positive Suppression</h3>
+  <ul>
+    <li>System prompt explicitly excludes Sanskrit/Ayurvedic terminology from scoring</li>
+    <li>Classical shloka quotations with citation markers labeled "Classical Reference — Not Flagged"</li>
+    <li>Botanical Latin names excluded</li>
+  </ul>
+
+  <h2>4. Out of Scope — v1</h2>
+  <table>
+    <tr><th>Feature</th><th>Rationale</th></tr>
+    <tr><td>Real-time Ayurvedic journal database</td><td>Requires licensing agreements; v2 target</td></tr>
+    <tr><td>Sanskrit OCR / Devanagari PDF extraction</td><td>Specialized pipeline; v2 target</td></tr>
+    <tr><td>Multi-file batch upload</td><td>v2 after single-file validation</td></tr>
+    <tr><td>User accounts &amp; authentication</td><td>Not needed for MVP</td></tr>
+    <tr><td>PDF upload and parsing</td><td>Text paste covers core use case</td></tr>
+    <tr><td>Web cross-referencing (Serper)</td><td>Removed to eliminate API key dependency; v2</td></tr>
+  </table>
+
+  <h2>5. Technical Architecture</h2>
+
+  <h3>5.1 Stack</h3>
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Notes</th></tr>
+    <tr><td>Frontend</td><td>HTML + Tailwind CSS (CDN) + Vanilla JS</td><td>Single file, no build step</td></tr>
+    <tr><td>AI Backend</td><td>Pollinations AI (<code>text.pollinations.ai</code>)</td><td>Free, CORS-enabled, no auth needed</td></tr>
+    <tr><td>URL Proxy</td><td>allorigins.win</td><td>Free CORS proxy for URL fetching</td></tr>
+    <tr><td>Hosting</td><td>GitHub Pages</td><td>Free, auto-deploys from main branch</td></tr>
+  </table>
+
+  <h3>5.2 Data Flow</h3>
+  <ol>
+    <li>User pastes text or fetches URL → text extracted client-side</li>
+    <li>Frontend sends text to <code>text.pollinations.ai</code> with domain-aware system prompt</li>
+    <li>AI returns JSON: score + flagged passages + classical refs + excluded terms + editor guidance</li>
+    <li>Frontend renders color-coded report (no server, no database)</li>
+  </ol>
+
+  <h3>5.3 Repository</h3>
+  <p>GitHub: <code>github.com/Shirapti-nath/ayurvedic-plagiarism-tool</code><br/>
+  Live URL: <code>shirapti-nath.github.io/ayurvedic-plagiarism-tool</code><br/>
+  PR #1: Full working prototype merged via <code>feat/ayurvedic-plagiarism-detector</code></p>
+
+  <h2>6. Success Metrics</h2>
+  <table>
+    <tr><th>Metric</th><th>Target</th></tr>
+    <tr><td>Response time</td><td>&lt; 30 seconds for a 2,000-word article</td></tr>
+    <tr><td>Score output</td><td>Clear 0–100% for every valid input</td></tr>
+    <tr><td>False positive control</td><td>Classical Sanskrit terms do not drive score above 15% on original work</td></tr>
+    <tr><td>Cost to user</td><td>Zero — no API key, no account, no payment</td></tr>
+    <tr><td>Uptime</td><td>GitHub Pages SLA (~99.9%)</td></tr>
+  </table>
+
+  <h2>7. Risks &amp; Mitigations</h2>
+  <table>
+    <tr><th>Risk</th><th>Mitigation</th></tr>
+    <tr><td>Pollinations AI rate limits or downtime</td><td>Show retry button; service is free-tier, best-effort</td></tr>
+    <tr><td>AI returns inconsistent JSON</td><td>parseJ() fallback returns minimal valid structure; never crashes</td></tr>
+    <tr><td>URL fetch blocked by paywalls</td><td>Clear error message; text paste is primary input method</td></tr>
+    <tr><td>Model quality vs. Claude</td><td>OpenAI-large model via Pollinations is GPT-4o class; sufficient for this task</td></tr>
+  </table>
+
+  <h2>8. Future Roadmap — v2</h2>
+  <ul>
+    <li>Web cross-referencing via Serper API (optional user-provided key)</li>
+    <li>Ayurvedic journal database integration (JAIM, AYU, Ancient Science of Life)</li>
+    <li>PDF upload with text extraction</li>
+    <li>Devanagari OCR for Sanskrit-script content</li>
+    <li>Batch upload for editors processing multiple submissions</li>
+    <li>Downloadable PDF report with institutional letterhead</li>
+  </ul>
+
+  <div style="margin-top:48px;padding-top:20px;border-top:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-size:11px;color:#94a3b8">Ayurvedic Plagiarism Detector · PRD v1.0 · April 2026</span>
+    <span style="font-size:11px;color:#94a3b8">shirapti-nath.github.io/ayurvedic-plagiarism-tool</span>
+  </div>
+
+</div>
+</body>
+</html>
