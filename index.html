@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ayurvedic Plagiarism Detector</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+
+    .passage-flagged-high {
+      background-color: #fee2e2;
+      border-left: 3px solid #ef4444;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+    .passage-flagged-medium {
+      background-color: #fef9c3;
+      border-left: 3px solid #eab308;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+    .passage-flagged-low {
+      background-color: #fff7ed;
+      border-left: 3px solid #f97316;
+      padding: 2px 4px;
+      border-radius: 2px;
+    }
+
+    .score-ring {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border: 8px solid;
+      transition: all 0.6s ease;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e5e7eb;
+      border-top: 4px solid #7c3aed;
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .fade-in { animation: fadeIn 0.4s ease-in; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .tab-btn.active {
+      border-bottom: 2px solid #7c3aed;
+      color: #7c3aed;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 px-6 py-4 flex items-center gap-3">
+    <div class="w-8 h-8 bg-violet-700 rounded-lg flex items-center justify-center">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 9.414V19a2 2 0 01-2 2z"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="text-lg font-bold text-slate-900 leading-tight">Ayurvedic Plagiarism Detector</h1>
+      <p class="text-xs text-slate-500">Domain-aware analysis for Ayurvedic research articles</p>
+    </div>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 py-8">
+
+    <!-- Input card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-6">
+      <h2 class="text-base font-semibold text-slate-800 mb-4">Submit Article for Analysis</h2>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-slate-200 mb-5 gap-6">
+        <button class="tab-btn active pb-3 text-sm" onclick="switchTab('text', event)">Paste Text</button>
+        <button class="tab-btn pb-3 text-sm text-slate-500" onclick="switchTab('url', event)">URL</button>
+      </div>
+
+      <!-- Text tab -->
+      <div id="tab-text">
+        <textarea
+          id="article-text"
+          rows="12"
+          placeholder="Paste your Ayurvedic research article here (minimum 100 characters, up to ~5,000 words)..."
+          class="w-full border border-slate-200 rounded-xl p-4 text-sm text-slate-800 resize-y focus:outline-none focus:ring-2 focus:ring-violet-400 placeholder:text-slate-400"
+        ></textarea>
+        <div class="flex justify-between items-center mt-2">
+          <span id="char-count" class="text-xs text-slate-400">0 characters</span>
+          <span class="text-xs text-slate-400">Recommended: 500–5,000 words</span>
+        </div>
+      </div>
+
+      <!-- URL tab -->
+      <div id="tab-url" class="hidden">
+        <div class="flex gap-3">
+          <input
+            id="article-url"
+            type="url"
+            placeholder="https://example.com/ayurvedic-research-article"
+            class="flex-1 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 placeholder:text-slate-400"
+          />
+          <button
+            onclick="fetchUrl()"
+            class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium px-5 py-3 rounded-xl transition"
+          >Fetch</button>
+        </div>
+        <p class="text-xs text-slate-400 mt-2">The article must be publicly accessible. Paywalled or bot-blocked pages may not load.</p>
+      </div>
+
+      <!-- Submit -->
+      <div class="mt-5 flex gap-3 items-center">
+        <button
+          id="analyze-btn"
+          onclick="analyze()"
+          class="bg-violet-700 hover:bg-violet-800 text-white text-sm font-semibold px-7 py-3 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Analyze for Plagiarism
+        </button>
+        <button
+          onclick="resetForm()"
+          class="text-sm text-slate-500 hover:text-slate-700 transition"
+        >Clear</button>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="loading" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-10 text-center mb-6 fade-in">
+      <div class="flex justify-center mb-5">
+        <div class="spinner"></div>
+      </div>
+      <p id="loading-step" class="text-base font-medium text-slate-700">Analyzing article...</p>
+      <p class="text-sm text-slate-400 mt-1">This typically takes 10–20 seconds for a 2,000-word article</p>
+      <div class="mt-6 flex gap-3 justify-center flex-wrap">
+        <span class="step-badge bg-violet-100 text-violet-700 text-xs px-3 py-1 rounded-full" id="step1">Preprocessing text</span>
+        <span class="step-badge bg-slate-100 text-slate-400 text-xs px-3 py-1 rounded-full" id="step2">AI semantic analysis</span>
+        <span class="step-badge bg-slate-100 text-slate-400 text-xs px-3 py-1 rounded-full" id="step3">Web cross-referencing</span>
+        <span class="step-badge bg-slate-100 text-slate-400 text-xs px-3 py-1 rounded-full" id="step4">Generating report</span>
+      </div>
+    </div>
+
+    <!-- Error state -->
+    <div id="error-box" class="hidden bg-red-50 border border-red-200 rounded-2xl p-5 mb-6 fade-in">
+      <div class="flex gap-3 items-start">
+        <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+        </svg>
+        <div>
+          <p class="text-sm font-semibold text-red-800">Analysis Failed</p>
+          <p id="error-msg" class="text-sm text-red-700 mt-1"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="results" class="hidden fade-in space-y-5">
+
+      <!-- Score overview -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <div class="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+          <div id="score-ring" class="score-ring flex-shrink-0">
+            <span id="score-number" class="text-3xl font-bold"></span>
+            <span class="text-xs font-medium mt-0.5">Plagiarism</span>
+          </div>
+          <div class="flex-1 text-center sm:text-left">
+            <h2 class="text-xl font-bold text-slate-900" id="score-label"></h2>
+            <p class="text-sm text-slate-600 mt-2 leading-relaxed" id="score-explanation"></p>
+            <div class="mt-4 flex flex-wrap gap-4 justify-center sm:justify-start text-sm">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-400 inline-block"></span>
+                <span class="text-slate-600">High confidence flags: <strong id="count-high">0</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+                <span class="text-slate-600">Medium flags: <strong id="count-medium">0</strong></span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-green-400 inline-block"></span>
+                <span class="text-slate-600">Domain terms excluded: <strong id="count-excluded">0</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Editor explanation -->
+      <div class="bg-violet-50 border border-violet-200 rounded-2xl p-5">
+        <div class="flex gap-3">
+          <svg class="w-5 h-5 text-violet-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <div>
+            <p class="text-sm font-semibold text-violet-900 mb-1">Editor Guidance</p>
+            <p id="editor-explanation" class="text-sm text-violet-800 leading-relaxed"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Classical references found -->
+      <div id="classical-section" class="hidden bg-green-50 border border-green-200 rounded-2xl p-5">
+        <p class="text-sm font-semibold text-green-900 mb-2">Classical References Detected (Not Flagged)</p>
+        <div id="classical-list" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Flagged passages -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-base font-semibold text-slate-800 mb-4">Suspicious Passages</h3>
+        <div id="flagged-list" class="space-y-4"></div>
+        <p id="no-flags-msg" class="hidden text-sm text-green-700 bg-green-50 rounded-xl p-4">
+          No suspicious passages detected. The article appears original.
+        </p>
+      </div>
+
+      <!-- Matched sources -->
+      <div id="sources-section" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+        <h3 class="text-base font-semibold text-slate-800 mb-4">Similar Web Sources Found</h3>
+        <div id="sources-list" class="space-y-3"></div>
+      </div>
+
+      <!-- Domain terms excluded -->
+      <div id="excluded-section" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+        <p class="text-sm font-semibold text-slate-700 mb-3">Ayurvedic Domain Terms Excluded from Scoring</p>
+        <div id="excluded-list" class="flex flex-wrap gap-2"></div>
+        <p class="text-xs text-slate-400 mt-3">These are standard Ayurvedic terms that appear across all research in the field. They are excluded to prevent false positives.</p>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="text-xs text-slate-400 text-center pb-4 leading-relaxed">
+        This tool provides plagiarism signals, not legal determinations. Results should be reviewed by a qualified editor.
+        Classical shloka citations with proper attribution are excluded from scoring.
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const API_BASE = "";  // relative — works on Vercel automatically
+    let activeTab = "text";
+    let stepTimer;
+
+    function switchTab(tab, event) {
+      activeTab = tab;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      if (event) event.target.classList.add("active");
+      document.getElementById("tab-text").classList.toggle("hidden", tab !== "text");
+      document.getElementById("tab-url").classList.toggle("hidden", tab !== "url");
+    }
+
+    document.getElementById("article-text").addEventListener("input", function () {
+      document.getElementById("char-count").textContent = `${this.value.length.toLocaleString()} characters`;
+    });
+
+    async function fetchUrl() {
+      const url = document.getElementById("article-url").value.trim();
+      if (!url) return;
+      showError("");
+      try {
+        const res = await fetch(`${API_BASE}/api/fetch-url`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "URL fetch failed");
+        document.getElementById("article-text").value = data.text;
+        document.getElementById("char-count").textContent = `${data.char_count.toLocaleString()} characters`;
+        switchTab("text", null);
+        document.querySelectorAll(".tab-btn")[0].classList.add("active");
+        document.querySelectorAll(".tab-btn")[1].classList.remove("active");
+      } catch (err) {
+        showError(err.message);
+      }
+    }
+
+    async function analyze() {
+      const text = document.getElementById("article-text").value.trim();
+      if (text.length < 100) {
+        showError("Please paste at least 100 characters of article text.");
+        return;
+      }
+      hideResults();
+      showLoading(true);
+      animateSteps();
+      try {
+        const res = await fetch(`${API_BASE}/api/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Analysis failed");
+        showLoading(false);
+        renderResults(data);
+      } catch (err) {
+        showLoading(false);
+        showError(err.message || "Analysis failed. Please check that the app is deployed correctly.");
+      }
+    }
+
+    function animateSteps() {
+      const steps = ["step1", "step2", "step3", "step4"];
+      const labels = ["Preprocessing text", "AI semantic analysis", "Web cross-referencing", "Generating report"];
+      let i = 0;
+      steps.forEach(id => {
+        document.getElementById(id).className = "step-badge bg-slate-100 text-slate-400 text-xs px-3 py-1 rounded-full";
+      });
+      document.getElementById("step1").className = "step-badge bg-violet-100 text-violet-700 text-xs px-3 py-1 rounded-full";
+      stepTimer = setInterval(() => {
+        if (i < steps.length - 1) {
+          document.getElementById(steps[i]).className = "step-badge bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full";
+          i++;
+          document.getElementById(steps[i]).className = "step-badge bg-violet-100 text-violet-700 text-xs px-3 py-1 rounded-full";
+          document.getElementById("loading-step").textContent = labels[i];
+        }
+      }, 4500);
+    }
+
+    function renderResults(data) {
+      clearInterval(stepTimer);
+      const score = data.score ?? 0;
+      const scoreColors = score <= 15
+        ? { ring: "#22c55e", text: "#15803d", label: "Minimal Concern" }
+        : score <= 35
+        ? { ring: "#eab308", text: "#854d0e", label: "Some Similarity" }
+        : score <= 60
+        ? { ring: "#f97316", text: "#9a3412", label: "Notable Similarity" }
+        : { ring: "#ef4444", text: "#991b1b", label: "High Similarity" };
+
+      const ring = document.getElementById("score-ring");
+      ring.style.borderColor = scoreColors.ring;
+      document.getElementById("score-number").textContent = `${score}%`;
+      document.getElementById("score-number").style.color = scoreColors.text;
+      document.getElementById("score-label").textContent = scoreColors.label;
+      document.getElementById("score-explanation").textContent = data.score_explanation || "";
+      document.getElementById("editor-explanation").textContent = data.explanation || "";
+
+      const flagged = data.flagged_passages || [];
+      document.getElementById("count-high").textContent = flagged.filter(p => p.confidence === "high").length;
+      document.getElementById("count-medium").textContent = flagged.filter(p => p.confidence === "medium").length;
+      document.getElementById("count-excluded").textContent = (data.domain_terms_excluded || []).length;
+
+      const flaggedList = document.getElementById("flagged-list");
+      const noFlagsMsg = document.getElementById("no-flags-msg");
+      flaggedList.innerHTML = "";
+      if (flagged.length === 0) {
+        noFlagsMsg.classList.remove("hidden");
+      } else {
+        noFlagsMsg.classList.add("hidden");
+        flagged.forEach(p => {
+          const confidenceClass = p.confidence === "high" ? "passage-flagged-high"
+            : p.confidence === "medium" ? "passage-flagged-medium" : "passage-flagged-low";
+          const confidenceColor = p.confidence === "high" ? "bg-red-100 text-red-700"
+            : p.confidence === "medium" ? "bg-yellow-100 text-yellow-700" : "bg-orange-100 text-orange-700";
+          const el = document.createElement("div");
+          el.className = "border border-slate-100 rounded-xl p-4 bg-slate-50";
+          el.innerHTML = `
+            <span class="text-xs font-semibold px-2 py-0.5 rounded-full ${confidenceColor}">
+              ${p.confidence.charAt(0).toUpperCase() + p.confidence.slice(1)} confidence
+            </span>
+            <blockquote class="${confidenceClass} mt-3 text-sm text-slate-700 leading-relaxed italic">
+              "${escapeHtml(p.text)}"
+            </blockquote>
+            <p class="text-xs text-slate-500 mt-2"><strong>Why flagged:</strong> ${escapeHtml(p.reason)}</p>
+            ${p.matched_source && p.matched_source !== "Unknown"
+              ? `<p class="text-xs text-slate-500 mt-1"><strong>Potential source:</strong> <a href="${escapeHtml(p.matched_source)}" target="_blank" rel="noopener noreferrer" class="text-violet-600 underline">${escapeHtml(p.matched_source)}</a></p>`
+              : ""}
+          `;
+          flaggedList.appendChild(el);
+        });
+      }
+
+      const classical = data.classical_references_found || [];
+      if (classical.length > 0) {
+        document.getElementById("classical-section").classList.remove("hidden");
+        document.getElementById("classical-list").innerHTML = classical.map(ref =>
+          `<span class="bg-green-100 text-green-800 text-xs px-3 py-1 rounded-full font-medium">${escapeHtml(ref)}</span>`
+        ).join("");
+      }
+
+      const sources = (data.matched_sources || []).filter(s => s.url && s.url !== "Unknown");
+      if (sources.length > 0) {
+        document.getElementById("sources-section").classList.remove("hidden");
+        document.getElementById("sources-list").innerHTML = sources.map(s => {
+          const rColor = s.relevance === "high" ? "bg-red-100 text-red-700"
+            : s.relevance === "medium" ? "bg-yellow-100 text-yellow-700" : "bg-slate-100 text-slate-600";
+          return `
+            <div class="border border-slate-100 rounded-xl p-4">
+              <div class="flex items-start justify-between gap-3">
+                <div class="flex-1 min-w-0">
+                  <a href="${escapeHtml(s.url)}" target="_blank" rel="noopener noreferrer"
+                     class="text-sm font-medium text-violet-700 hover:text-violet-900 underline truncate block">
+                    ${escapeHtml(s.title || s.url)}
+                  </a>
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">${escapeHtml(s.matched_excerpt || "")}</p>
+                </div>
+                <span class="text-xs px-2 py-0.5 rounded-full flex-shrink-0 ${rColor}">
+                  ${(s.relevance || "low").charAt(0).toUpperCase() + (s.relevance || "low").slice(1)}
+                </span>
+              </div>
+            </div>`;
+        }).join("");
+      }
+
+      const excluded = data.domain_terms_excluded || [];
+      if (excluded.length > 0) {
+        document.getElementById("excluded-section").classList.remove("hidden");
+        document.getElementById("excluded-list").innerHTML = excluded.map(term =>
+          `<span class="bg-slate-100 text-slate-600 text-xs px-3 py-1 rounded-full">${escapeHtml(term)}</span>`
+        ).join("");
+      }
+
+      document.getElementById("results").classList.remove("hidden");
+      document.getElementById("results").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function showLoading(show) {
+      document.getElementById("loading").classList.toggle("hidden", !show);
+      document.getElementById("analyze-btn").disabled = show;
+    }
+
+    function hideResults() {
+      ["results", "error-box", "classical-section", "sources-section", "excluded-section"].forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+    }
+
+    function showError(msg) {
+      const box = document.getElementById("error-box");
+      if (!msg) { box.classList.add("hidden"); return; }
+      document.getElementById("error-msg").textContent = msg;
+      box.classList.remove("hidden");
+    }
+
+    function resetForm() {
+      document.getElementById("article-text").value = "";
+      document.getElementById("article-url").value = "";
+      document.getElementById("char-count").textContent = "0 characters";
+      hideResults();
+      showError("");
+      showLoading(false);
+      clearInterval(stepTimer);
+    }
+
+    function escapeHtml(text) {
+      if (!text) return "";
+      return String(text).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  </script>
+</body>
+</html>
