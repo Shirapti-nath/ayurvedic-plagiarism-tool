@@ -196,8 +196,12 @@ const SYSTEM_PROMPT = `You are an expert in Ayurvedic medicine, Sanskrit texts, 
 function getKeys(){return{anthropic:localStorage.getItem('anthropic_key')||'',serper:localStorage.getItem('serper_key')||''};}
 function openSettings(){const k=getKeys();document.getElementById('input-anthropic-key').value=k.anthropic;document.getElementById('input-serper-key').value=k.serper;document.getElementById('settings-error').classList.add('hidden');document.getElementById('settings-modal').classList.remove('hidden');}
 function closeSettings(){document.getElementById('settings-modal').classList.add('hidden');}
-function saveSettings(){const ak=document.getElementById('input-anthropic-key').value.trim();const sk=document.getElementById('input-serper-key').value.trim();const err=document.getElementById('settings-error');if(!ak){err.textContent='Anthropic API key is required.';err.classList.remove('hidden');return;}localStorage.setItem('anthropic_key',ak);sk?localStorage.setItem('serper_key',sk):localStorage.removeItem('serper_key');closeSettings();checkSetup();}
-function checkSetup(){document.getElementById('setup-banner').classList.toggle('hidden',!!getKeys().anthropic);}
+function saveSettings(){const ak=document.getElementById('input-anthropic-key').value.trim();const sk=document.getElementById('input-serper-key').value.trim();const err=document.getElementById('settings-error');if(!ak){err.textContent='Anthropic API key is required.';err.classList.remove('hidden');return;}localStorage.setItem('anthropic_key',ak);sk?localStorage.setItem('serper_key',sk):localStorage.removeItem('serper_key');closeSettings();checkSetup();
+// Auto-open settings on first visit
+if (!localStorage.getItem("anthropic_key")) {
+  setTimeout(() => openSettings(), 400);
+}}
+function checkSetup(){const hasKey=!!getKeys().anthropic;document.getElementById('setup-banner').classList.toggle('hidden',hasKey);}
 
 async function callClaude(userPrompt){
   const{anthropic}=getKeys();
